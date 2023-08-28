@@ -1,0 +1,53 @@
+{
+  "services": [
+    {
+      "id": "configuat1",
+      "type": "tron",
+      "display_name": "UAT App1",
+      "source_repository": "https://github.com/newrelic/demo-nodetron.git",
+      "deploy_script_path": "deploy/linux/roles",
+      "port": 5555,
+      "destinations": ["confighost1"]
+    },{
+      "id": "configuat2",
+      "display_name": "UAT App2",
+      "source_repository": "https://github.com/newrelic/demo-nodetron.git",
+      "deploy_script_path": "deploy/linux/roles",
+      "port": 8000,
+      "destinations": ["confighost1"]
+    },{
+      "id": "configuat3",
+      "display_name": "UAT App3",
+      "source_repository": "https://github.com/newrelic/demo-nodetron.git",
+      "deploy_script_path": "deploy/linux/roles",
+      "port": 5556,
+      "destinations": ["confighost1"]
+    }
+  ],
+
+  "global_tags": {
+    "DeployedBy": "UAT"
+  },
+
+  "resources": [
+    {
+      "id": "confighost1",
+      "provider": "aws",
+      "type": "ec2",
+      "size": "t2.nano",
+      "tags": {
+        "OpsTeam": "OpsUat",
+        "BillingCode": "1"
+      }
+    },{
+      "id": "configuatelb",
+      "provider": "aws",
+      "type": "elb",
+      "listeners": ["configuat1"],
+      "tags": {
+        "OpsTeam": "OpsUat",
+        "BillingCode": "2"
+      }
+    }
+  ]
+}

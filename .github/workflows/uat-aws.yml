@@ -1,0 +1,126 @@
+name: UatAws
+
+on: [push, pull_request]
+
+jobs:
+  test-cloudprovider-aws:
+    runs-on: ubuntu-latest
+    if: always() && github.event_name == 'push'
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+
+      - name: Generate Default SSH Keypair
+        run: ssh-keygen -m PEM -t rsa -b 4096 -f $HOME/.ssh/id_rsa -q -N ""
+
+      - name: Write AWS Certificate to File
+        env:
+          AWS_PEM: ${{ secrets.UAT_AWS_PEM_FILE }}
+        run: |
+          rm -f $GITHUB_WORKSPACE/configs/uat-ca.pem
+          echo "$AWS_PEM" > $GITHUB_WORKSPACE/configs/uat-ca.pem
+          sudo chmod 400 $GITHUB_WORKSPACE/configs/uat-ca.pem
+
+      - name: Write UAT JSON to file
+        env:
+          UAT_JSON: ${{ secrets.UAT_USER_AWS }}
+        run: |
+          echo "$UAT_JSON" > user_acceptance_tests/aws/uat${{ github.run_id }}.json.local
+
+      - name: Build the docker image
+        run: docker build -t deployer .
+
+      - name: Cloud Provider Tests (AWS)
+        run: docker run -i --entrypoint bundle deployer exec rake test:uat:aws
+
+  slack-notify:
+    runs-on: ubuntu-latest
+    needs: [test-cloudprovider-aws]
+    if: always() && github.event_name == 'push'
+    steps:
+      - name: Build Result Slack Notification
+        uses:  8398a7/action-slack@v3
+        with:
+          author_name: GitHub Actions
+          status: custom
+          fields: commit,repo,ref,author,eventName,message,workflow
+          custom_payload: |
+            {
+              username: "GitHub Actions",
+              icon_emoji: ":octocat:",
+              attachments: [{
+                color: ${{
+                  needs.test-cloudprovider-aws.result == 'success'
+                }} === true ? '#43cc11' : '#e05d44',
+                blocks: [
+                  {
+                    type: "section",
+                    text: {
+                      type: "mrkdwn",
+                      text: `Build for ${process.env.AS_REPO}`
+                    }
+                  },
+                  {
+                    type: "section",
+                    fields: [
+                      {
+                        type: "mrkdwn",
+                        text: `*Commit:*\n${process.env.AS_COMMIT}`
+                      },
+                      {
+                        type: "mrkdwn",
+                        text: `*Author:*\n${process.env.AS_AUTHOR}`
+                      },
+                      {
+                        type: "mrkdwn",
+                        text: `*Branch:*\n${process.env.AS_REF}`
+                      },
+                      {
+                        type: "mrkdwn",
+                        text: `*Message:*\n${process.env.AS_MESSAGE}`
+                      },
+                      {
+                        type: "mrkdwn",
+                        text: `*Type:*\n${process.env.AS_EVENT_NAME}`
+                      },
+                      {
+                        type: "mrkdwn",
+                        text: "*PR:*\n${{ github.event.pull_request.html_url }}"
+                      },
+                      {
+                        type: "mrkdwn",
+                        text: `*Workflow:*\n${ process.env.AS_WORKFLOW }`
+                      }
+                    ]
+                  },
+                  {
+                    type: "section",
+                    text: {
+                      type: "mrkdwn",
+                      text: [
+                        "*Result:*",
+                        `• ${ ${{ needs.test-cloudprovider-aws.result == 'success' }} === true ? '✅' : '❌' } AWS cloud provider test: ${{ needs.test-cloudprovider-aws.result }}`
+                      ].join('\n')
+                    }
+                  },
+                  {
+                    type: "context",
+                    elements: [
+                      {
+                        type: "image",
+                        image_url: "https://avatars2.githubusercontent.com/in/15368",
+                        alt_text: "Github Actions"
+                      },
+                      {
+                        type: "mrkdwn",
+                        text: "This message was created automatically by GitHub Actions."
+                      }
+                    ]
+                  }
+                ]
+              }]
+            }
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+
