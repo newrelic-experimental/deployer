@@ -1,0 +1,33 @@
+---
+roles:
+  # New Relic
+  - newrelic.newrelic_java_agent
+  - newrelic.newrelic-infra
+
+collections:
+  # AWS
+  - name: community.aws
+    version: 5.0.0
+  - name: amazon.aws
+    version: 5.1.0
+
+  - name: azure.azcollection
+    version: 1.14.0
+
+  # GCP
+  - name: google.cloud
+    version: 1.0.2
+
+  # Windows
+  - name: ansible.windows
+    version: 1.12.0
+  
+  # MySQL
+  - name: community.mysql
+    version: 3.5.1
+
+  # Global
+  - name: ansible.posix
+    version: 1.4.0
+  - name: community.general
+    version: 5.8.0

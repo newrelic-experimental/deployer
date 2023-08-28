@@ -1,0 +1,60 @@
+---
+deployerMajorVersion: "3"
+deployerMinorVersion: "9"
+deployerBuildVersion: "0"
+
+#executionPath is where the files associated with your deploy will get created
+#and where you will find your deployment summary file.
+executionPath: "/tmp"
+summaryFilename: "deploy_summary.txt"
+summaryIniFilename: "hosts.ini"
+
+#defaultUserConfigPath is available to avoid having to pass one more mount for docker deploys
+defaultUserConfigPath: "configs/*.credentials.local.json"
+
+ansibleRolesPath: "$HOME/.ansible/roles"
+
+
+#ids are combined with other fields for unique naming which is important when
+#deploying into a shared cloud provider account.  Use with caution.
+serviceIdMaxLength: 10
+resourceIdMaxLength: 20
+
+#AWS-specific defaults. Where applicable, keep costs down by limiting size and quantity.
+awsEc2SupportedSizes: ["t2.nano", "t2.micro", "t2.small", "t2.medium", "t2.large", "t3.nano", "t3.micro", "t3.small", "t3.medium", "t3.large", "t3.xlarge", "t3a.nano", "t3a.micro", "t3a.small", "t3a.medium", "t3a.large", "t3a.xlarge", "t4g.nano", "t4g.micro", "t4g.small", "t4g.medium", "t4g.large", "t4g.xlarge"]
+awsElbPort: 80
+awsElbMaxListeners: 50
+awsApiGatewaySleepTimeSeconds: 35
+
+# Azure-specific defaults.
+azureVmSupportedSizes: ["Standard_B1s","Standard_B1ms","Standard_B2s","Standard_B2ms","Standard_E2_v3"]
+
+# Gcp-specific defaults.
+gcpComputeSupportedSizes: ["e2-micro","e2-small","e2-medium","n1-standard-1","n1-standard-2","n1-standard-4"]
+
+# New Relic API defaults
+newRelicUrls:
+        us:
+                collector_url: "collector.newrelic.com"
+                api_url: "https://api.newrelic.com"
+                infra_collector_url: "https://infra-api.newrelic.com"
+                infra_command_url: "https://infrastructure-command-api.newrelic.com"
+                identity_url: "https://identity-api.newrelic.com"
+                logging_url: "https://log-api.newrelic.com/log/v1"
+                cloud_collector_url: "https://cloud-collector.newrelic.com"
+        eu:
+                collector_url: "collector.eu.newrelic.com"
+                api_url: "https://api.eu.newrelic.com"
+                infra_collector_url: "https://infra-api.eu.newrelic.com"
+                infra_command_url: "https://infrastructure-command-api.eu.newrelic.com"
+                identity_url: "https://identity-api.eu.newrelic.com"
+                logging_url: "https://log-api.eu.newrelic.com/log/v1"
+                cloud_collector_url: "https://cloud-collector.eu.newrelic.com"
+        staging:
+                collector_url: "staging-collector.newrelic.com"
+                api_url: "https://staging-api.newrelic.com"
+                infra_collector_url: "https://staging-infra-api.newrelic.com"
+                infra_command_url: "https://staging-infrastructure-command-api.newrelic.com"
+                identity_url: "https://staging-identity-api.newrelic.com"
+                logging_url: "https://staging-log-api.newrelic.com/log/v1"
+                cloud_collector_url: "https://staging-cloud-collector.newrelic.com"

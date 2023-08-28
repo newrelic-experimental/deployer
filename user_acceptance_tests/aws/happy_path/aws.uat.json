@@ -1,0 +1,85 @@
+{
+  "services": [
+    {
+      "id": "uat5",
+      "display_name": "UAT5 AWS NodeJS App",
+      "source_repository": "-b main https://github.com/newrelic/demo-nodetron.git",
+      "deploy_script_path": "deploy/linux/roles",
+      "port": 5003,
+      "relationships": ["uat6"],
+      "destinations": ["host2"]
+    },{
+      "id": "uat6",
+      "display_name": "UAT6 AWS NodeJS App",
+      "source_repository": "-b main https://github.com/newrelic/demo-nodetron.git",
+      "deploy_script_path": "deploy/linux/roles",
+      "port": 5004,
+      "destinations": ["host3"]
+    },
+    {
+      "id": "uat7",
+      "display_name": "UAT7 AWS Lambda Python App",
+      "source_repository": "https://github.com/newrelic/demo-pythontron.git",
+      "deploy_script_path": "deploy/lambda/roles",
+      "destinations": ["lambdahost"]
+    }
+  ],
+
+  "global_tags": {
+    "dxOwningTeam": "DEMO",
+    "dxEnvironment": "development",
+    "dxDepartment": "product",
+    "dxProduct": "V3",
+    "dxDeployedBy": "UAT AWS Happy"
+  },
+
+  "resources": [
+    {
+        "id": "host2",
+        "provider": "aws",
+        "type": "ec2",
+        "size": "t2.small",
+        "tags": {
+          "OpsTeam": "OpsUat",
+          "BillingCode": "1"
+        }
+    },{
+        "id": "host3",
+        "provider": "aws",
+        "type": "ec2",
+        "size": "t2.micro",
+        "tags": {
+          "OpsTeam": "OpsUat",
+          "BillingCode": "1"
+        }
+    },
+    {
+      "id": "lambdahost",
+      "provider": "aws",
+      "type": "lambda"
+    }
+  ],
+
+  "instrumentations": {
+    "resources": [
+      {
+        "id": "nr_infra",
+        "resource_ids": ["host2","host3"],
+        "provider": "newrelic",
+        "source_repository": "-b main https://github.com/newrelic/demo-newrelic-instrumentation.git",
+        "deploy_script_path": "deploy/linux/roles",
+        "version": "1.12.2" 
+      }
+    ],
+    "services": [
+      {
+        "id": "nr_node_agent",
+        "service_ids": ["uat5","uat6"],
+        "provider": "newrelic",
+        "source_repository": "-b main https://github.com/newrelic/demo-newrelic-instrumentation.git",
+        "deploy_script_path": "deploy/node/linux/roles",
+        "version": "6.11.0"
+      }
+    ]
+  }
+}

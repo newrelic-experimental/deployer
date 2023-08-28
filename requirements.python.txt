@@ -1,0 +1,16 @@
+# Generic
+setuptools
+
+# Ansible
+ansible-core==2.13.4
+
+# AWS
+boto3
+botocore
+boto
+
+# GCP
+google-auth
+
+# Windows
+pywinrm

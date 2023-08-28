@@ -1,0 +1,8 @@
+---
+
+- hosts: <%= action_name %>
+  vars:
+    <% action_vars.each do |key,value| %>
+    <%= key %>: <%= value %><% end %>
+  roles:
+  - <%= action_name %>
