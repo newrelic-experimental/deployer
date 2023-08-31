@@ -1,11 +1,13 @@
 name: UatAws
 
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
+    branches: [main]
 
 jobs:
   test-cloudprovider-aws:
     runs-on: ubuntu-latest
-    if: always() && github.event_name == 'push'
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
@@ -36,10 +38,9 @@ jobs:
   slack-notify:
     runs-on: ubuntu-latest
     needs: [test-cloudprovider-aws]
-    if: always() && github.event_name == 'push'
     steps:
       - name: Build Result Slack Notification
-        uses:  8398a7/action-slack@v3
+        uses: 8398a7/action-slack@v3
         with:
           author_name: GitHub Actions
           status: custom
@@ -123,4 +124,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-
