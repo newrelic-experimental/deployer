@@ -1,0 +1,28 @@
+name: release-test
+
+on: workflow_dispatch
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Determine next version
+        id: semver-dry-run
+        uses: anothrNick/github-tag-action@1.64.0
+        env:
+          DRY_RUN: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true
+          DEFAULT_BUMP: patch
+          NONE_STRING_TOKEN: (none)
+          PATCH_STRING_TOKEN: (patch)
+          MINOR_STRING_TOKEN: (minor)
+          MAJOR_STRING_TOKEN: (major)
+      - name: Output next version
+        env:
+          RESULT: ${{ toJson(steps.semver-dry-run) }}
+        run: echo "$RESULT"
