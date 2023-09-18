@@ -14,6 +14,6 @@ rescue Exception => e
     Common::Logger::LoggerFactory.get_logger.error(e)
     Common::Logger::LoggerFactory.get_logger.error(e.backtrace)
   end
-  exit!(1)
+  exit(1)
 end
 exit(0)
