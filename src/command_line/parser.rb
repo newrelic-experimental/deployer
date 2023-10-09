@@ -60,6 +60,10 @@ module CommandLine
         options[:is_output_ini] = true
       end
 
+      @opts.on('-z', '--delete_tmp', FalseClass, 'Upon completion, delete the entire deployment_path tmp folder (default false)') do |config|
+        options[:delete_tmp] = true
+      end
+
       return options
     end
 

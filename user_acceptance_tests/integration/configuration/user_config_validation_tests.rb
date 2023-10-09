@@ -14,24 +14,26 @@ require "./user_acceptance_tests/spoofers/test_spoofers"
 describe "UserAcceptanceTests::UserConfig" do
   describe "FailedValidation" do
     let(:arguments) { [] }
+    let(:credentials) { {} }
     let(:context) { Context.new() }
     let(:resource) { create_resource("host1", "aws", "ec2", "t2.small") }
     let(:resources) { [resource] }
     let(:service) { create_service("app1", 8080, ["host1"], "/tmp") }
     let(:services) { [service] }
-    let(:api_key) { "api key content"}
-    let(:secret_key) { "private key content"}
-    let(:secret_key_path) { "private key path"}
-    let(:region) { "portland level 22"}
-    let(:credentials) { {} }
+    let(:api_key) { "api key content" }
+    let(:secret_key) { "private key content" }
+    let(:pem_key_name) { "SomeKeyPairName" }
+    let(:pem_key_data) { "supersecretdata" }
+    let(:pem_key_path) { "private key path" }
+    let(:region) { "portland level 22" }
     let(:user_config_filename) { UserAcceptanceTests::JsonFileBuilder.create_filename() }
     let(:deploy_config_filename) { UserAcceptanceTests::JsonFileBuilder.create_filename() }
     let(:user_config_jsonfilebuilder) { UserAcceptanceTests::JsonFileBuilder.new(user_config_filename) }
     let(:deploy_config_jsonfilebuilder) { UserAcceptanceTests::JsonFileBuilder.new(deploy_config_filename) }
     let(:spoofers) { UserAcceptanceTests::Spoofers::TestSpoofers.new([
-      user_config_jsonfilebuilder,
-      deploy_config_jsonfilebuilder
-      ])}
+                                                                       user_config_jsonfilebuilder,
+                                                                       deploy_config_jsonfilebuilder
+                                                                     ]) }
     let(:orchestrator) { ConfigurationOrchestrator.new(context) }
 
     after do
@@ -59,7 +61,7 @@ describe "UserAcceptanceTests::UserConfig" do
     end
 
     it "should fail on missing api key" do
-      given_credential("aws", nil, secret_key, secret_key_path, region)
+      given_credential("aws", nil, secret_key, nil, nil, pem_key_path, region)
       given_user_config(credentials)
       given_deploy_config(resources, services)
       error = assert_raises Common::ValidationError do
@@ -69,7 +71,7 @@ describe "UserAcceptanceTests::UserConfig" do
     end
 
     it "should fail on missing secret key" do
-      given_credential("aws", api_key, nil, secret_key_path, region)
+      given_credential("aws", api_key, nil, nil, nil, pem_key_path, region)
       given_user_config(credentials)
       given_deploy_config(resources, services)
       error = assert_raises Common::ValidationError do
@@ -78,18 +80,38 @@ describe "UserAcceptanceTests::UserConfig" do
       error.message.must_include("secretKey")
     end
 
-    it "should fail on missing secret key path" do
-      given_credential("aws", api_key, secret_key, nil, region)
+    it "should fail on missing secret key path and missing key data" do
+      given_credential("aws", api_key, secret_key, pem_key_name, nil, nil, region)
       given_user_config(credentials)
       given_deploy_config(resources, services)
       error = assert_raises Common::ValidationError do
         orchestrator.execute(arguments)
       end
-      error.message.must_include("secret_key_path")
+      error.message.must_include(UserConfig::Validators::Aws::PemKeyValidator::ERROR_DETAILS)
+    end
+
+    it "should fail on missing secret key path and missing key name" do
+      given_credential("aws", api_key, secret_key, nil, pem_key_data, nil, region)
+      given_user_config(credentials)
+      given_deploy_config(resources, services)
+      error = assert_raises Common::ValidationError do
+        orchestrator.execute(arguments)
+      end
+      error.message.must_include(UserConfig::Validators::Aws::PemKeyValidator::ERROR_DETAILS)
+    end
+
+    it "should fail on missing secret key path, key name and key data" do
+      given_credential("aws", api_key, secret_key, nil, nil, nil, region)
+      given_user_config(credentials)
+      given_deploy_config(resources, services)
+      error = assert_raises Common::ValidationError do
+        orchestrator.execute(arguments)
+      end
+      error.message.must_include(UserConfig::Validators::Aws::PemKeyValidator::ERROR_DETAILS)
     end
 
     it "should fail on missing region" do
-      given_credential("aws", api_key, secret_key, secret_key_path, nil)
+      given_credential("aws", api_key, secret_key, nil, nil, pem_key_path, nil)
       given_user_config(credentials)
       given_deploy_config(resources, services)
       error = assert_raises Common::ValidationError do
@@ -101,7 +123,7 @@ describe "UserAcceptanceTests::UserConfig" do
   end
 
   def create_resource(id, provider = nil, type = nil, size = nil)
-    resource = {id: id}
+    resource = { id: id }
     unless provider.nil?
       resource[:provider] = provider
     end
@@ -115,7 +137,7 @@ describe "UserAcceptanceTests::UserConfig" do
   end
 
   def create_service(id, port = nil, destinations = nil, local_source_path = nil)
-    service = {id: id, deploy_script_path: "/deploy"}
+    service = { id: id, deploy_script_path: "/deploy" }
     unless port.nil?
       service[:port] = port
     end
@@ -128,21 +150,28 @@ describe "UserAcceptanceTests::UserConfig" do
     return service
   end
 
-  def given_credential(provider, api_key = nil, secret_key = nil, secret_key_path = nil, region = nil)
-    access = { }
+  def given_credential(provider, api_key = nil, secret_key = nil, pem_key_name = nil, pem_key_data = nil, pem_key_path = nil, region = nil)
+    provider_fields = {}
     unless api_key.nil?
-      access[:apiKey] = api_key
+      provider_fields["apiKey"] = api_key
     end
     unless secret_key.nil?
-      access[:secretKey] = secret_key
+      provider_fields["secretKey"] = secret_key
     end
-    unless secret_key_path.nil?
-      access[:secretKeyPath] = "user_acceptance_tests/secret_file.pem"
+    unless pem_key_name.nil?
+      provider_fields["secretKeyName"] = pem_key_name
+    end
+    unless pem_key_data.nil?
+      provider_fields["secretKeyData"] = pem_key_data
+    end
+    unless pem_key_path.nil?
+      provider_fields["secretKeyPath"] = pem_key_path
     end
     unless region.nil?
-      access[:region] = region
+      provider_fields["region"] = region
     end
-    credentials[provider] = access
+
+    credentials[provider] = provider_fields
   end
 
   def given_user_config(credentials = [], filename = user_config_filename)

@@ -23,10 +23,6 @@ module CommandLine
       return @deploy_file_content
     end
 
-    def is_teardown?()
-      return @options[:is_teardown] == true
-    end
-
     def get_user_config_filepath()
       return @options[:user_config]
     end
@@ -61,24 +57,34 @@ module CommandLine
       deployname = get_deploy_config_name()
       return "#{username}-#{deployname}"
     end
-
-    def get_logging_level()
-      return @options[:logging_level].downcase()
-    end
-
     def get_deployment_config(object_class = Hash)
       deploy_config_content = get_deployment_config_content || "{}"
       return JSON.parse(deploy_config_content, object_class: object_class)
     end
 
+    def get_deployment_path()
+      return @deployment_path ||= "#{get_execution_path()}/#{get_deployment_name()}"
+    end
+
+    def get_logging_level()
+      return @options[:logging_level].downcase()
+    end
+
     def get_output_file_path()
       return @options[:output_file_path]
+    end
+    def is_delete_tmp?()
+      return @options[:delete_tmp] == true
     end
 
     def is_output_ini?()
       return @options[:is_output_ini]
     end
-  
+
+    def is_teardown?()
+      return @options[:is_teardown] == true
+    end
+
     private
     def download_file(url, filepath)
       Common::Logger::LoggerFactory.get_logger().debug("Downloading from #{url} to #{filepath}")
@@ -122,19 +128,14 @@ module CommandLine
     end
 
     def is_url?(input)
-      if input!=nil && input.downcase().start_with?("http")
+      if input != nil && input.downcase().start_with?("http")
         return true
       end
       return false
     end
 
-
     def get_execution_path()
       return @execution_path ||= @context.get_app_config_provider().get_execution_path()
-    end
-
-    def get_deployment_path()
-      return @deployment_path ||= "#{get_execution_path()}/#{get_deployment_name()}"
     end
 
   end

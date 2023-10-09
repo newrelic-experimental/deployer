@@ -18,18 +18,18 @@ describe "UserConfig" do
     end
 
     it "should execute credential validator" do
-      given_credential("aws", nil, nil, "/tmp/file.pem")
+      given_credential("aws", nil, nil, nil, nil, "/tmp/file.pem")
       credentials_validator.expects(:execute)
       validator.execute(config)
     end
     
     it "should execute provider_validator_factory" do
-      given_credential("aws", nil, nil, "/tmp/file.pem")
+      given_credential("aws", nil, nil, nil, nil , "/tmp/file.pem")
       provider_validator_factory.expects(:create_validators).returns([])
       validator.execute(config)
     end
 
-    def given_credential(provider, api_key = nil, secret_key = nil, secret_key_path = nil, region = nil)
+    def given_credential(provider, api_key = nil, secret_key = nil, pem_key_name = nil, pem_key_data = nil, pem_key_path = nil, region = nil)
       provider_fields = { }
       unless api_key.nil?
         provider_fields["apiKey"] = api_key
@@ -37,8 +37,14 @@ describe "UserConfig" do
       unless secret_key.nil?
         provider_fields["secretKey"] = secret_key
       end
-      unless secret_key_path.nil?
-        provider_fields["secretKeyPath"] = secret_key_path
+      unless pem_key_name.nil?
+        provider_fields["secretKeyName"] = pem_key_name
+      end
+      unless pem_key_data.nil?
+        provider_fields["secretKeyData"] = pem_key_data
+      end
+      unless pem_key_path.nil?
+        provider_fields["secretKeyPath"] = pem_key_path
       end
       unless region.nil?
         provider_fields["region"] = region
