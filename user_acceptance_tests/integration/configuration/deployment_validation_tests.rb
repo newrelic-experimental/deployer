@@ -82,7 +82,7 @@ describe "UserAcceptanceTests::Deployment" do
           orchestrator.execute(arguments)
         end
       end
-      error.message.must_include("secret_key_path")
+      error.message.must_include(UserConfig::Validators::Aws::PemKeyValidator::ERROR_DETAILS)
     end
 
     it "should fail on missing region" do

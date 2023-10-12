@@ -43,6 +43,8 @@ module UserConfig
           return nil
         end
 
+        def ensure_created(deployment_path, config_credential)
+        end
     end
   end
 end

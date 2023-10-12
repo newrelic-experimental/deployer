@@ -10,11 +10,13 @@ describe "UserConfig::Validators::AwsValidator" do
   let(:secret_key_validator) { m = mock(); m.stubs(:execute); m }
   let(:region_validator) { m = mock(); m.stubs(:execute); m }
   let(:api_key_validator) { m = mock(); m.stubs(:execute); m }
+  let(:pem_key_validator) { m = mock(); m.stubs(:execute); m }
   let(:validator) { UserConfig::Validators::AwsValidator.new(
     api_key_exist_validator,
     secret_key_validator,
     region_validator,
-    api_key_validator
+    api_key_validator,
+    pem_key_validator
     ) }
 
   it "should create validator" do
@@ -44,6 +46,13 @@ describe "UserConfig::Validators::AwsValidator" do
     api_key_validator.expects(:execute)
     validator.execute(aws_configs)
   end
+
+  it "should execute pem_key_validator" do
+    given_aws_credential("my api key", "my secret key", "my secret key path", "my region")
+    pem_key_validator.expects(:execute)
+    validator.execute(aws_configs)
+  end
+
 
   def given_aws_credential(api_key = nil, secret_key = nil, secret_key_path = nil, region = nil)
     aws_config = { }

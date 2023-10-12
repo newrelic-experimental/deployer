@@ -22,11 +22,19 @@ module UserConfig
       end
 
       def get_secret_key_name()
+        value = query("secretKeyName")
+        unless value.nil?
+          return value
+        end
         secrect_key_path = get_secret_key_path()
         unless secrect_key_path.nil?
           return File.basename(secrect_key_path, ".*")
         end
         return nil
+      end
+
+      def get_secret_key_data()
+        return query("secretKeyData")
       end
 
       def get_secret_key_path()
@@ -46,6 +54,21 @@ module UserConfig
         return nil
       end
 
+      def ensure_created(deployment_path, config_credential)
+        name = get_secret_key_name()
+        data = get_secret_key_data()
+        if !name.nil? && !name.empty? && !data.nil? && !data.empty?
+          # no key path in config, but key name and data specified
+          file_path = "#{deployment_path}/#{name}.pem"
+          write_config(file_path, data)
+          Common::Tasks::ProcessTask.new("chmod 400 #{file_path}", "./").wait_to_completion()
+          items = {}
+          items["secretKeyPath"] = file_path
+          config_credential.merge!(items)
+        end
+      end
+
+
       def to_h(key_prefix = @provider)
         items = {}
         add_if_exist(items, "access_key", get_access_key(), key_prefix)
@@ -55,6 +78,14 @@ module UserConfig
         add_if_exist(items, "secret_key_path", get_secret_key_path(), key_prefix)
         add_if_exist(items, "region", get_region(), key_prefix)
         return items
+      end
+
+      private
+      def write_config(filepath, content)
+        File.open(filepath, "w+") do |f|
+          a = content.split('\\n')
+          f.puts(a)
+        end
       end
 
     end
