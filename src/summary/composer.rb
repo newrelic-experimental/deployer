@@ -122,8 +122,7 @@ module Summary
     def get_resource_deployment_name(provisioned_resource)
       output = ""
       if provisioned_resource.get_resource().respond_to?(:get_tags)
-        deployment_name = ""
-        deployment_name += provisioned_resource.get_resource().get_tags()["dxDeploymentName"]
+        deployment_name = provisioned_resource.get_resource().get_tags()["dxDeploymentName"].to_s
         output += "deployment name: #{deployment_name}\n" unless deployment_name.empty?
       end
       return output
