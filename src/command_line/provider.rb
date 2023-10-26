@@ -52,6 +52,10 @@ module CommandLine
       return input
     end
 
+    def get_deploy_config_url()
+      return @options[:deploy_config]
+    end
+
     def get_deployment_name()
       username = get_user_config_name()
       deployname = get_deploy_config_name()

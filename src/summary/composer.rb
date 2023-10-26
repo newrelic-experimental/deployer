@@ -3,13 +3,13 @@ require 'time'
 module Summary
   class Composer
 
-    def execute(provisioned_resources, installed_services, resource_instrumentors, service_instrumentors, global_instrumentors)
+    def execute(provisioned_resources, installed_services, resource_instrumentors, service_instrumentors, global_instrumentors, deploy_config_url)
       summary = ""
 
       summary += get_global_summary(global_instrumentors) unless global_instrumentors.nil? || global_instrumentors.empty?
       summary += "\n"
 
-      summary += get_resource_summary(installed_services, provisioned_resources, resource_instrumentors) unless provisioned_resources.nil?
+      summary += get_resource_summary(installed_services, provisioned_resources, resource_instrumentors, deploy_config_url) unless provisioned_resources.nil?
       summary += "\n"
 
       summary += get_service_summary(installed_services, provisioned_resources, service_instrumentors) unless installed_services.nil?
@@ -66,17 +66,21 @@ module Summary
       return output
     end
 
-    def get_resource_summary(installed_services, provisioned_resources, resource_instrumentors)
+    def get_resource_summary(installed_services, provisioned_resources, resource_instrumentors, deploy_config_url)
       output = "Deployed Resources:\n\n"
       provisioned_resources.each do |provisioned_resource|
         type = provisioned_resource.get_type()
         provider = provisioned_resource.get_provider()
         resource_id = provisioned_resource.get_id()
+        deployment_name = get_resource_deployment_name(provisioned_resource)
+        deploy_config_url = get_deploy_config_url(deploy_config_url)
         access_point = get_resource_access_point(provisioned_resource)
         instrumentation_summary = get_instrumentation_summary(resource_id, resource_instrumentors)
         resource_services_summary = get_resource_services_summary(installed_services, resource_id)
         output += "  #{resource_id} (#{provider}/#{type}):\n"
         output += "    #{access_point}" unless access_point.empty?
+        output += "    #{deployment_name}" unless deployment_name.empty?
+        output += "    #{deploy_config_url}" unless deploy_config_url.empty?
         output += "    #{resource_services_summary}" unless installed_services.nil? || resource_services_summary.empty?
         output += "    #{instrumentation_summary}" unless resource_instrumentors.nil? || instrumentation_summary.empty?
         output += "\n"
@@ -113,6 +117,21 @@ module Summary
         collection.push(service.get_id()) if service.get_destinations().include?(resource_id)
       end
       return collection
+    end
+
+    def get_resource_deployment_name(provisioned_resource)
+      output = ""
+      if provisioned_resource.get_resource().respond_to?(:get_tags)
+        deployment_name = provisioned_resource.get_resource().get_tags()["dxDeploymentName"].to_s
+        output += "deployment name: #{deployment_name}\n" unless deployment_name.empty?
+      end
+      return output
+    end
+
+    def get_deploy_config_url(deploy_config_url)
+      output = ""
+      output += "deploy config url: #{deploy_config_url}\n" unless deploy_config_url.empty?
+      return output
     end
 
     def get_resource_access_point(provisioned_resource)
