@@ -11,6 +11,7 @@ module Teardown
       summary += "    #{deploy_config_url}" unless deploy_config_url.empty?
 
       Common::Logger::LoggerFactory.get_logger.info(summary)
+      return summary
     end
 
     def get_deploy_config_url(deploy_config_url)
