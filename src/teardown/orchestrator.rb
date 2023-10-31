@@ -54,8 +54,11 @@ module Teardown
       get_post_actions_orchestrator().execute()
       remove_temporary_resources
 
+      deployment_name = get_deployment_name()
+      deploy_config_url = get_deploy_config_url()
+
       log_token.success()
-      get_summary().execute()
+      get_summary().execute(deployment_name, deploy_config_url)
     end
 
     private
@@ -109,6 +112,14 @@ module Teardown
 
     def is_delete_tmp?
       return @context.get_command_line_provider().is_delete_tmp?()
+    end
+
+    def get_deploy_config_url
+      return @context.get_command_line_provider().get_deploy_config_url()
+    end
+
+    def get_deployment_name
+      return @context.get_command_line_provider().get_deployment_name()
     end
 
     def get_deployment_path
