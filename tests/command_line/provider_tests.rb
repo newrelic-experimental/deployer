@@ -41,6 +41,13 @@ describe "Commandline::Provider" do
       expect(provider.get_deploy_config_name()).must_equal(filename) 
     end
   end
+
+  describe "get_deploy_config_url" do
+    fileurl = "path1/path2/deploy.json"
+    it "should return the deploy_config url" do
+      expect(provider.get_deploy_config_url()).must_equal(fileurl)
+    end
+  end
   
   describe "get_deployment_name" do
     it "should return the deployment name" do

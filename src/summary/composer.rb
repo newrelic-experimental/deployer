@@ -3,13 +3,13 @@ require 'time'
 module Summary
   class Composer
 
-    def execute(provisioned_resources, installed_services, resource_instrumentors, service_instrumentors, global_instrumentors, deploy_config_url)
+    def execute(provisioned_resources, installed_services, resource_instrumentors, service_instrumentors, global_instrumentors, deployment_name, deploy_config_url)
       summary = ""
 
       summary += get_global_summary(global_instrumentors) unless global_instrumentors.nil? || global_instrumentors.empty?
       summary += "\n"
 
-      summary += get_resource_summary(installed_services, provisioned_resources, resource_instrumentors, deploy_config_url) unless provisioned_resources.nil?
+      summary += get_resource_summary(installed_services, provisioned_resources, resource_instrumentors, deployment_name, deploy_config_url) unless provisioned_resources.nil?
       summary += "\n"
 
       summary += get_service_summary(installed_services, provisioned_resources, service_instrumentors) unless installed_services.nil?
@@ -66,13 +66,13 @@ module Summary
       return output
     end
 
-    def get_resource_summary(installed_services, provisioned_resources, resource_instrumentors, deploy_config_url)
+    def get_resource_summary(installed_services, provisioned_resources, resource_instrumentors, deployment_name, deploy_config_url)
       output = "Deployed Resources:\n\n"
       provisioned_resources.each do |provisioned_resource|
         type = provisioned_resource.get_type()
         provider = provisioned_resource.get_provider()
         resource_id = provisioned_resource.get_id()
-        deployment_name = get_resource_deployment_name(provisioned_resource)
+        deployment_name = get_deployment_name(deployment_name)
         deploy_config_url = get_deploy_config_url(deploy_config_url)
         access_point = get_resource_access_point(provisioned_resource)
         instrumentation_summary = get_instrumentation_summary(resource_id, resource_instrumentors)
@@ -119,12 +119,9 @@ module Summary
       return collection
     end
 
-    def get_resource_deployment_name(provisioned_resource)
+    def get_deployment_name(deployment_name)
       output = ""
-      if provisioned_resource.get_resource().respond_to?(:get_tags)
-        deployment_name = provisioned_resource.get_resource().get_tags()["dxDeploymentName"].to_s
-        output += "deployment name: #{deployment_name}\n" unless deployment_name.empty?
-      end
+      output += "deployment name: #{deployment_name}\n" unless deployment_name.empty?
       return output
     end
 
