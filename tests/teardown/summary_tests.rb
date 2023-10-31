@@ -10,7 +10,7 @@ describe "Teardown::Summary" do
     let(:deploy_config_url) { "https://example.com/config.json" }
 
     it "should include deploy config url" do
-        summary = composer.execute(depoyment_name, deploy_config_url)
+        summary = composer.execute(deployment_name, deploy_config_url)
         summary.must_include(deploy_config_url)
     end
 
