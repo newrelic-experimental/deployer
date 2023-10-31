@@ -125,7 +125,7 @@ describe "Summary::Composure" do
     given_service(service1)
     given_provisioned_resource(host_resource)
     summary = composer.execute(provisioned_resources, services, resource_instrumentors, service_instrumentors, global_instrumentors, deployment_name, deploy_config_url)
-    summary.must_include(deployment_url)
+    summary.must_include(deploy_config_url)
   end
 
   it "should verify composer execute returns service id" do
