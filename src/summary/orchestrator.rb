@@ -50,9 +50,11 @@ module Summary
       resource_instrumentors = instrumentation_provider.get_all_resource_instrumentors()
       service_instrumentors = instrumentation_provider.get_all_service_instrumentors()
       global_intrumentors = instrumentation_provider.get_all_global_instrumentors()
+
+      deployment_name = @context.get_command_line_provider.get_deployment_name()
       deploy_config_url = @context.get_command_line_provider.get_deploy_config_url()
 
-      composer_result = @summary_composer.execute(provisioned_resources, installed_services, resource_instrumentors, service_instrumentors, global_intrumentors, deploy_config_url)
+      composer_result = @summary_composer.execute(provisioned_resources, installed_services, resource_instrumentors, service_instrumentors, global_intrumentors, deployment_name, deploy_config_url)
 
       summary = "Deployment successful!\n\n"
       summary += "#{composer_result}"

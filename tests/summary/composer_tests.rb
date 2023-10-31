@@ -54,7 +54,7 @@ describe "Summary::Composure" do
     instrumentor
   }
   let(:deploy_config_url) { "https://example.com/config.json" }
-
+  let(:deployment_name) { "example-instance" }
 
   let(:global_instrumentors) { [] }
   let(:global1) { Instrumentation::Definitions::GlobalInstrumentor.new('id', instrumentation_provider, 'version', 'deploy_script_path', 'source_path') }
@@ -64,7 +64,7 @@ describe "Summary::Composure" do
     given_service(service1)
     given_provisioned_resource(host_resource)
     given_global_instrumentor(global1)
-    summary = composer.execute(provisioned_resources, services, resource_instrumentors, service_instrumentors, global_instrumentors, deploy_config_url)
+    summary = composer.execute(provisioned_resources, services, resource_instrumentors, service_instrumentors, global_instrumentors, deployment_name, deploy_config_url)
 
     summary.must_include("id (#{instrumentation_provider})")
   end
@@ -72,7 +72,7 @@ describe "Summary::Composure" do
   it "should verify composer execute does not return global if it is not provided" do
     given_service(service1)
     given_provisioned_resource(host_resource)
-    summary = composer.execute(provisioned_resources, services, resource_instrumentors, service_instrumentors, global_instrumentors, deploy_config_url)
+    summary = composer.execute(provisioned_resources, services, resource_instrumentors, service_instrumentors, global_instrumentors, deployment_name, deploy_config_url)
 
     summary.wont_include("Global Instrumentation:")
   end
@@ -82,7 +82,7 @@ describe "Summary::Composure" do
     given_provisioned_resource(host_resource)
     given_global_instrumentor(global1)
     given_global_instrumentor(global2)
-    summary = composer.execute(provisioned_resources, services, resource_instrumentors, service_instrumentors, global_instrumentors, deploy_config_url)
+    summary = composer.execute(provisioned_resources, services, resource_instrumentors, service_instrumentors, global_instrumentors, deployment_name, deploy_config_url)
 
     summary.must_include("id (#{instrumentation_provider})")
     summary.must_include("id2 (#{instrumentation_provider})")
@@ -103,34 +103,48 @@ describe "Summary::Composure" do
   it "should verify composer executes with no errors" do
     given_service(service1)
     given_provisioned_resource(host_resource)
-    summary = composer.execute(provisioned_resources, services, resource_instrumentors, service_instrumentors, global_instrumentors, deploy_config_url)
+    summary = composer.execute(provisioned_resources, services, resource_instrumentors, service_instrumentors, global_instrumentors, deployment_name, deploy_config_url)
     summary.wont_be_empty()
   end
 
   it "should verify composer execute returns the host ip value" do
     given_service(service1)
     given_provisioned_resource(host_resource)
-    summary = composer.execute(provisioned_resources, services, resource_instrumentors, service_instrumentors, global_instrumentors, deploy_config_url)
+    summary = composer.execute(provisioned_resources, services, resource_instrumentors, service_instrumentors, global_instrumentors, deployment_name, deploy_config_url)
     summary.must_include(ip)
+  end
+
+  it "should verify composer execute returns the deployment name value" do
+    given_service(service1)
+    given_provisioned_resource(host_resource)
+    summary = composer.execute(provisioned_resources, services, resource_instrumentors, service_instrumentors, global_instrumentors, deployment_name, deploy_config_url)
+    summary.must_include(deployment_name)
+  end
+
+  it "should verify composer execute returns the deploy config url value" do
+    given_service(service1)
+    given_provisioned_resource(host_resource)
+    summary = composer.execute(provisioned_resources, services, resource_instrumentors, service_instrumentors, global_instrumentors, deployment_name, deploy_config_url)
+    summary.must_include(deployment_url)
   end
 
   it "should verify composer execute returns service id" do
     given_service(service1)
     given_provisioned_resource(host_resource)
-    summary = composer.execute(provisioned_resources, services, resource_instrumentors, service_instrumentors, global_instrumentors, deploy_config_url)
+    summary = composer.execute(provisioned_resources, services, resource_instrumentors, service_instrumentors, global_instrumentors, deployment_name, deploy_config_url)
     summary.must_include(app_id)
   end
 
   it "should verify composer execute returns service url" do
     given_service(service1)
     given_provisioned_resource(host_resource)
-    summary = composer.execute(provisioned_resources, services, resource_instrumentors, service_instrumentors, global_instrumentors, deploy_config_url)
+    summary = composer.execute(provisioned_resources, services, resource_instrumentors, service_instrumentors, global_instrumentors, deployment_name, deploy_config_url)
     summary.must_include("http://"+ip+":"+port.to_s())
   end
 
   it "should output resource url" do
     given_provisioned_resource(elb_resource)
-    summary = composer.execute(provisioned_resources, services, resource_instrumentors, service_instrumentors, global_instrumentors, deploy_config_url)
+    summary = composer.execute(provisioned_resources, services, resource_instrumentors, service_instrumentors, global_instrumentors, deployment_name, deploy_config_url)
     summary.must_include(elb_url)
   end
 
@@ -138,7 +152,7 @@ describe "Summary::Composure" do
     given_service(service1)
     given_provisioned_resource(host_resource)
     given_instrumented_resource(instrumented_resource)
-    summary = composer.execute(provisioned_resources, services, resource_instrumentors, service_instrumentors, global_instrumentors, deploy_config_url)
+    summary = composer.execute(provisioned_resources, services, resource_instrumentors, service_instrumentors, global_instrumentors, deployment_name, deploy_config_url)
     summary.must_include(instrumentation_provider)
   end
 
@@ -146,7 +160,7 @@ describe "Summary::Composure" do
     given_service(service1)
     given_provisioned_resource(host_resource)
     given_instrumented_service(instrumented_service)
-    summary = composer.execute(provisioned_resources, services, resource_instrumentors, service_instrumentors, global_instrumentors, deploy_config_url)
+    summary = composer.execute(provisioned_resources, services, resource_instrumentors, service_instrumentors, global_instrumentors, deployment_name, deploy_config_url)
     summary.must_include(instrumentation_provider)
   end
 
