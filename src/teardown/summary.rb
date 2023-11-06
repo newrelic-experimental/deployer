@@ -16,7 +16,7 @@ module Teardown
 
     def get_deploy_config_url(deploy_config_url)
       output = ""
-      output += "deploy config url: #{deploy_config_url}\n" unless deploy_config_url.empty?
+      output += " { \"deploy_config_url\": \"#{deploy_config_url}\", \"deployment_action\": \"teardown\" } " unless deploy_config_url.empty?
       return output
     end
 
