@@ -13,7 +13,7 @@ rescue Exception => e
   unless e.message.downcase() == "exit"
     Common::Logger::LoggerFactory.get_logger.error(e)
     Common::Logger::LoggerFactory.get_logger.error(e.backtrace)
-    puts "\n{ \"deploy_config_url\":\"#{context.get_command_line_provider.get_deploy_config_filepath}\", \"deployment_action\": \"error\" } \n\n"
+    puts "\n{\"deploy_config_url\":\"#{context.get_command_line_provider.get_deploy_config_filepath}\", \"deployment_action\": \"error\" } \n\n"
   end
   exit(1)
 end

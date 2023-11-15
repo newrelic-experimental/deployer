@@ -11,9 +11,9 @@ module Summary
 
       summary += get_resource_summary(installed_services, provisioned_resources, resource_instrumentors, deployment_name, deploy_config_url) unless provisioned_resources.nil?
       summary += "\n"
-
       summary += get_service_summary(installed_services, provisioned_resources, service_instrumentors) unless installed_services.nil?
       summary += "Completed at #{Time.now}\n"
+      summary += "    #{get_deploy_config_url(deploy_config_url)}" unless deploy_config_url.empty?
       summary += "\n"
       return summary
     end
@@ -73,14 +73,12 @@ module Summary
         provider = provisioned_resource.get_provider()
         resource_id = provisioned_resource.get_id()
         deployment_name = get_deployment_name(deployment_name)
-        deploy_config_url = get_deploy_config_url(deploy_config_url)
         access_point = get_resource_access_point(provisioned_resource)
         instrumentation_summary = get_instrumentation_summary(resource_id, resource_instrumentors)
         resource_services_summary = get_resource_services_summary(installed_services, resource_id)
         output += "  #{resource_id} (#{provider}/#{type}):\n"
         output += "    #{access_point}" unless access_point.empty?
         output += "    #{deployment_name}" unless deployment_name.empty?
-        output += "    #{deploy_config_url}" unless deploy_config_url.empty?
         output += "    #{resource_services_summary}" unless installed_services.nil? || resource_services_summary.empty?
         output += "    #{instrumentation_summary}" unless resource_instrumentors.nil? || instrumentation_summary.empty?
         output += "\n"
@@ -127,7 +125,7 @@ module Summary
 
     def get_deploy_config_url(deploy_config_url)
       output = ""
-      output += " { \"deploy_config_url\": \"#{deploy_config_url}\", \"deployment_action\": \"provision\" } " unless deploy_config_url.empty?
+      output += "\n{ \"deploy_config_url\": \"#{deploy_config_url}\", \"deployment_action\": \"provision\" } \n" unless deploy_config_url.empty?
       return output
     end
 
