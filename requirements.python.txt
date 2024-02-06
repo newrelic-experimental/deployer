@@ -2,7 +2,7 @@
 setuptools
 
 # Ansible
-ansible-core==2.13.4
+ansible-core==2.15.9
 
 # AWS
 boto3
