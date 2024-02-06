@@ -15,7 +15,7 @@ jobs:
       - name: Install Dependencies
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.4
+          ruby-version: 3.0.5
           bundler-cache: true
 
       - name: Lint
@@ -32,7 +32,7 @@ jobs:
       - name: Install Dependencies
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.4
+          ruby-version: 3.0.5
           bundler-cache: true
 
       - name: Unit Tests
@@ -47,7 +47,7 @@ jobs:
       - name: Install Dependencies
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.4
+          ruby-version: 3.0.5
           bundler-cache: true
 
       - name: Generate Default SSH Keypair

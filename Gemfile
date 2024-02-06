@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'aws-sdk-apigateway', '~> 1.0.0.rc7'
+gem 'aws-sdk-apigateway', '~> 1.91.0'
 gem 'minitest', '5.11.3'
 gem 'minitest-hooks', '1.5.0'
 gem 'mocha', '1.8.0'
