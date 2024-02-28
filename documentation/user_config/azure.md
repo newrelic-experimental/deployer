@@ -67,7 +67,7 @@ Unfortunately, the region code to use are not listed, but can infered from Azure
 
 In order to create and access azure `Virtual Machines`, we need to create an SSH key pair.
 
-* Use this command to create an RSA SSH key pair with a length of 4096 bits in the `$HOME/demo-deployer/configs` directory: `ssh-keygen -m PEM -t rsa -b 4096 -f $HOME/demo-deployer/configs/azrkey`. If you would like to place the files in a different directory, just change the file path after the `-f` option.
+* Use this command to create an RSA SSH key pair with a length of 4096 bits in the `$HOME/deployer/configs` directory: `ssh-keygen -m PEM -t rsa -b 4096 -f $HOME/deployer/configs/azrkey`. If you would like to place the files in a different directory, just change the file path after the `-f` option.
 * Enter the relative path to the file you just created as the sshPublicKeyPath. This should be `configs/azrkey.pub`. If you created the file in a different directory, then you should use that path instead.
 
 ## Create a new Azure account
