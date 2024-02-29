@@ -1,6 +1,6 @@
 # Developer
 
-The deployer is part of a `demo` ecosystem. Each component can plug with the deployer through a set of Ansible plays which the deployer leverages and invokes. Specific data between resources and services is marshalled as needed.
+The deployer originally was developed as part of a `demo` ecosystem. Each component can plug with the deployer through a set of Ansible plays which the deployer leverages and invokes. Specific data between resources and services is marshalled as needed.
 
 ![Image of architecture](DeployerArchitecture.png)
 
@@ -149,7 +149,7 @@ rake test:uat:azure
 
 ### Trons definition
 
-A `Tron` is type of application that can be deployed with the `demo-deployer` for the purpose of a particular demo. It's typically a lightweight service, with the below APIs:
+A `Tron` is type of application that can be deployed with the `deployer` for the purpose of a particular demo. It's typically a lightweight service, with the below APIs:
 * /api/inventory
 * /api/inventory/[1-10]
 * /api/validateMessage?message=[xxx]
