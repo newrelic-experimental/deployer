@@ -26,3 +26,5 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: newrelic/deployer:${{steps.describe-tags.outputs.TAG}},newrelic/deployer:latest
+          secrets: |
+            "ssh_private_key=${{ secrets.CROWDSTRIKE_REPO_KEY }}"

@@ -18,8 +18,7 @@ RUN gem install bundler -v 1.17.3
 RUN apt-get update
 RUN apt-get install curl -y
 RUN apt-get update
-RUN apt-get install git -y
-RUN apt-get install rsync -y
+RUN apt-get install git rsync -y
 
 # Terraform
 RUN \
@@ -44,7 +43,7 @@ RUN gem install rexml -v '3.2.5' --source 'https://rubygems.org/'
 
 RUN bundle install --clean --force
 
-COPY requirements.python.txt requirements.ansible.yml /mnt/deployer/
+COPY requirements.python.txt requirements.ansible.yml requirements.ansible.private.yml /mnt/deployer/
 
 RUN python3 -m pip install -r requirements.python.txt
 
@@ -55,20 +54,22 @@ RUN python3 -m pip install -r requirements-azure.txt
 RUN ansible-galaxy role install -r requirements.ansible.yml && \
     ansible-galaxy collection install -r requirements.ansible.yml
 
-# Install private Ansible dependencies
-ARG ssh_prv_key
-ARG ssh_key_passphrase
-RUN if [[ -n "$ssh_prv_key" ]]; then \
+# Install optional private dependencies
+# Build with `--secret id=ssh_private_key,src=/path/to/ssh_private_key` to install private dependencies
+RUN mkdir -p -m 0600 /root/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
+RUN --mount=type=secret,id=ssh_private_key \
+    if test -f /run/secrets/ssh_private_key; then \
     mkdir -p /root/.ssh && \
     chmod 0700 /root/.ssh && \
     ssh-keyscan github.com > /root/.ssh/known_hosts && \
-    echo "$ssh_prv_key" > /root/.ssh/id_rsa && \
+    cat /run/secrets/ssh_private_key > /root/.ssh/id_rsa && \
     chmod 600 /root/.ssh/id_rsa && \
     eval `ssh-agent -s` && \
-    printf "$ssh_key_passphrase\n" | ssh-add /root/.ssh/id_rsa && \
-    ansible-galaxy collection install -r requirements.ansible.private.yml && \
+    ssh-add /root/.ssh/id_rsa && \
+    ansible-galaxy collection install -r requirements.ansible.private.yml  && \
     rm -rf /root/.ssh; \
     fi
+
 
 COPY . /mnt/deployer/
 # CMD [ "ruby", "--version"]
