@@ -8,7 +8,7 @@ RUN apt-get update && DEBIAN_FRONTEND="noninteractive" apt-get install -y locale
 RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
     dpkg-reconfigure --frontend=noninteractive locales && \
     update-locale LANG=en_US.UTF-8
-ENV LANG en_US.UTF-8 
+ENV LANG en_US.UTF-8
 
 # Install Ruby
 RUN apt-get install ruby-full -y
@@ -23,12 +23,12 @@ RUN apt-get install rsync -y
 
 # Terraform
 RUN \
-# Update
-apt-get update -y && \
-# Install Unzip
-apt-get install unzip -y && \
-# need wget
-apt-get install wget -y
+    # Update
+    apt-get update -y && \
+    # Install Unzip
+    apt-get install unzip -y && \
+    # need wget
+    apt-get install wget -y
 RUN wget https://releases.hashicorp.com/terraform/0.11.11/terraform_0.11.11_linux_amd64.zip
 # Unzip
 RUN unzip terraform_0.11.11_linux_amd64.zip
@@ -52,8 +52,23 @@ RUN curl -O https://raw.githubusercontent.com/ansible-collections/azure/dev/requ
 RUN python3 -m pip install -r requirements-azure.txt
 
 # Install Ansible dependencies
-RUN ansible-galaxy role install -r requirements.ansible.yml
-RUN ansible-galaxy collection install -r requirements.ansible.yml
+RUN ansible-galaxy role install -r requirements.ansible.yml && \
+    ansible-galaxy collection install -r requirements.ansible.yml
+
+# Install private Ansible dependencies
+ARG ssh_prv_key
+ARG ssh_key_passphrase
+RUN if [[ -n "$ssh_prv_key" ]]; then \
+    mkdir -p /root/.ssh && \
+    chmod 0700 /root/.ssh && \
+    ssh-keyscan github.com > /root/.ssh/known_hosts && \
+    echo "$ssh_prv_key" > /root/.ssh/id_rsa && \
+    chmod 600 /root/.ssh/id_rsa && \
+    eval `ssh-agent -s` && \
+    printf "$ssh_key_passphrase\n" | ssh-add /root/.ssh/id_rsa && \
+    ansible-galaxy collection install -r requirements.ansible.private.yml && \
+    rm -rf /root/.ssh; \
+    fi
 
 COPY . /mnt/deployer/
 # CMD [ "ruby", "--version"]

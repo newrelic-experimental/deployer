@@ -1,0 +1,5 @@
+---
+collections:
+  # Crowdstrike
+  - name: git@github.com:/newrelic/shared-crowdstrike-ansible-role.git
+    type: git

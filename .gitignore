@@ -61,3 +61,6 @@ build-iPhoneSimulator/
 .rvmrc
 
 *.swp
+
+# Python venv
+.venv
