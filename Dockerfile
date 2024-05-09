@@ -47,8 +47,8 @@ COPY requirements.python.txt requirements.ansible.yml requirements.ansible.priva
 
 RUN python3 -m pip install -r requirements.python.txt
 
-RUN curl -O https://raw.githubusercontent.com/ansible-collections/azure/dev/requirements-azure.txt
-RUN python3 -m pip install -r requirements-azure.txt
+RUN curl -O https://raw.githubusercontent.com/ansible-collections/azure/dev/requirements.txt
+RUN python3 -m pip install -r requirements.txt
 
 # Install Ansible dependencies
 RUN ansible-galaxy role install -r requirements.ansible.yml && \
