@@ -25,6 +25,8 @@
     network_tags: <%= gcp[:network_tags] %>
 
     artifact_path: <%= compute[:artifact_file_path] %>
+    service_account_email: <%= gcp[:service_account_email] %> # Add the service account email
+    ansible_ssh_private_key_file: <%= compute[:secret_key_path] %> # Add the SSH private key path
 
   tasks:
     - include_tasks: vnet.yml
@@ -72,6 +74,10 @@
           project: "{{ project }}"
           auth_kind: "{{ auth_kind }}"
           service_account_file: "{{ service_account_file }}"
+          service_accounts: # Explicitly set the service account
+                      - email: "{{ service_account_email }}"
+                        scopes:
+                          - https://www.googleapis.com/auth/cloud-platform
           state: present
 
     - block:
