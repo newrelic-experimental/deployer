@@ -15,6 +15,7 @@
       "accountId": "NR_ACCOUNT_ID",
       "accountRootId": "NR_ACCOUNT_ROOT_ID",
       "nrRegion": "NR_REGION",
+      "nrOrganizationId": "NR_ORGANIZATION_ID",
       "urls": {
         "collector": "NR_COLLECTOR_URL",
         "api": "NR_API_URL",

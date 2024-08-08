@@ -5,16 +5,15 @@ The `newrelic` user configuration has the following schema:
 ```json
 {
   "credentials": {
-
     "newrelic": {
       "licenseKey": "my_license_key",
       "nrPersonalApiKey": "my_personal_api_key",
       "insightsInsertApiKey": "my_insigths_insert_api_key",
       "accountId": "my_account_id",
       "accountRootId": "my_account_root_id",
-      "nrRegion": "US"
+      "nrRegion": "US",
+      "nrOrganizationId": "my_organization_id"
     }
-
   }
 }
 ```
@@ -52,6 +51,10 @@ Typically, your [New Relic region](https://docs.newrelic.com/docs/using-new-reli
 
 All possible regions are listed below:
 
-* `US`
-* `EU`
-* `AP`
+- `US`
+- `EU`
+- `AP`
+
+### nrOrganizationId
+
+The deployer uses New Relic organization ID to make changes to your account. To obtain your organization ID click [here](https://one.newrelic.com/admin-portal/organizations/organization-detail).
