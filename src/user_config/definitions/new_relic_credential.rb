@@ -36,6 +36,10 @@ module UserConfig
           return query("nrRegion")
         end
 
+        def get_organization_id()
+          return query("nrOrganizationId")
+        end
+
         def get_collector_url()
           return query("urls.collector") 
         end
@@ -77,6 +81,7 @@ module UserConfig
           add_if_exist(items, "account_id", get_account_id(), key_prefix)
           add_if_exist(items, "account_root_id", get_account_root_id(), key_prefix)
           add_if_exist(items, "region", get_region(), key_prefix)
+          add_if_exist(items, "organization_id", get_organization_id(), key_prefix)
           add_if_exist(items, "collector_url", get_collector_url(), key_prefix)
           add_if_exist(items, "api_url", get_api_url(), key_prefix)
           add_if_exist(items, "infra_collector_url", get_infra_collector_url(), key_prefix)
