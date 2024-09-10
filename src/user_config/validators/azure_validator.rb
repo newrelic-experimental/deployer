@@ -1,5 +1,6 @@
 require "./src/common/validators/file_exist"
 require "./src/common/validators/validator"
+require_relative "azure/ssh_key_validator"
 
 module UserConfig
   module Validators
@@ -19,7 +20,7 @@ module UserConfig
         @subscription_id_validator = subscription_id_validator || Common::Validators::FieldExistValidator.new("subscription_id", "subscription_id is missing for azure credential:")
         @secret_validator = secret_validator || Common::Validators::FieldExistValidator.new("secret", "secret is missing for azure credential:")
         @region_validator = region_validator || Common::Validators::FieldExistValidator.new("region", "region is missing for azure credential:")
-        @ssh_public_key_validator = ssh_public_key_validator || Common::Validators::FieldExistValidator.new("sshPublicKeyPath", "sshPublicKeyPath is missing for azure credential:")
+        @ssh_public_key_validator = ssh_public_key_validator || UserConfig::Validators::Azure::SshKeyValidator.new()
         @ssh_public_key_file_validator = ssh_public_key_file_validator || Common::Validators::FileExist.new("A valid SSH public key file could not be found in the path defined")
       end
 
@@ -33,11 +34,23 @@ module UserConfig
           lambda { return @ssh_public_key_validator.execute(azure_configs) },
         ]
         azure_configs.each do |azure_config|
-          validators.push(
-            lambda { return @ssh_public_key_file_validator.execute(azure_config["sshPublicKeyPath"]) }
-          )
+          sshPublicKeyPath = azure_config["sshPublicKeyPath"]
+          # skip validation if path is not mounted to the user config
+          if sshPublicKeyPath
+            if sshPublicKeyPath.start_with?("[env:")
+              env_var_name = azure_config["sshPublicKeyPath"][5..-2]
+              if ENV[env_var_name]
+                validators.push(
+                  lambda { return @ssh_public_key_file_validator.execute(ENV[env_var_name]) }
+                )
+              end
+            else
+              validators.push(
+                lambda { return @ssh_public_key_file_validator.execute(azure_config["sshPublicKeyPath"]) }
+              )
+            end
+          end
         end
-
         validator = Common::Validators::Validator.new(validators)
         return validator.execute()
       end
