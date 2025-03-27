@@ -2,7 +2,7 @@
 setuptools
 
 # Ansible
-ansible-core==2.15.6
+ansible-core>=2.15.6
 packaging
 requests[security]
 xmltodict
