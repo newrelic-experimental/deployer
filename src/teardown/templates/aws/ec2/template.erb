@@ -63,3 +63,21 @@
       register: result
       until: result is not failed
       ignore_errors: yes
+
+    - name: Delete IAM instance profile
+      amazon.aws.iam_instance_profile:
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        aws_session_token: "{{ aws_session_token }}"
+        name: "{{ resource_name }}-ssm-profile"
+        state: absent
+      ignore_errors: yes
+
+    - name: Delete IAM role
+      amazon.aws.iam_role:
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        aws_session_token: "{{ aws_session_token }}"
+        name: "{{ resource_name }}-ssm-role"
+        state: absent
+      ignore_errors: yes
