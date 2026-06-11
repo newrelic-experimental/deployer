@@ -43,7 +43,7 @@ RUN gem install rexml -v '3.2.5' --source 'https://rubygems.org/'
 
 RUN bundle install --clean --force
 
-COPY requirements.python.txt requirements.ansible.yml requirements.ansible.private.yml /mnt/deployer/
+COPY requirements.python.txt requirements.ansible.yml /mnt/deployer/
 
 RUN python3 -m pip install -r requirements.python.txt
 
@@ -53,23 +53,6 @@ RUN python3 -m pip install -r requirements.txt
 # Install Ansible dependencies
 RUN ansible-galaxy role install -r requirements.ansible.yml && \
     ansible-galaxy collection install -r requirements.ansible.yml
-
-# Install optional private dependencies
-# Build with `--secret id=ssh_private_key,src=/path/to/ssh_private_key` to install private dependencies
-RUN mkdir -p -m 0600 /root/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
-RUN --mount=type=secret,id=ssh_private_key \
-    if test -f /run/secrets/ssh_private_key; then \
-    mkdir -p /root/.ssh && \
-    chmod 0700 /root/.ssh && \
-    ssh-keyscan github.com > /root/.ssh/known_hosts && \
-    cat /run/secrets/ssh_private_key > /root/.ssh/id_rsa && \
-    chmod 600 /root/.ssh/id_rsa && \
-    eval `ssh-agent -s` && \
-    ssh-add /root/.ssh/id_rsa && \
-    ansible-galaxy collection install -r requirements.ansible.private.yml  && \
-    rm -rf /root/.ssh; \
-    fi
-
 
 COPY . /mnt/deployer/
 # CMD [ "ruby", "--version"]
