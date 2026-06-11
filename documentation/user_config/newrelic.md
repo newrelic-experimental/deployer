@@ -53,7 +53,7 @@ All possible regions are listed below:
 
 - `US`
 - `EU`
-- `AP`
+- `JP`
 
 ### nrOrganizationId
 
