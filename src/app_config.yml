@@ -50,6 +50,14 @@ newRelicUrls:
                 identity_url: "https://identity-api.eu.newrelic.com"
                 logging_url: "https://log-api.eu.newrelic.com/log/v1"
                 cloud_collector_url: "https://cloud-collector.eu.newrelic.com"
+        jp:
+                collector_url: "collector.jp.nr-data.net"
+                api_url: "https://api.jp.newrelic.com"
+                infra_collector_url: "https://infra-api.jp.nr-data.net"
+                infra_command_url: "https://infrastructure-command-api.jp.nr-data.net"
+                identity_url: "https://identity-api.jp.nr-data.net"
+                logging_url: "https://log-api.jp.nr-data.net/log/v1"
+                cloud_collector_url: "https://cloud-collector.jp.nr-data.net"
         staging:
                 collector_url: "staging-collector.newrelic.com"
                 api_url: "https://staging-api.newrelic.com"
