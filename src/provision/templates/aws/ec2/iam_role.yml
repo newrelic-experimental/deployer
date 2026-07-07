@@ -1,0 +1,41 @@
+---
+- name: Create IAM role for SSM access
+  amazon.aws.iam_role:
+    aws_access_key: "{{ access_key }}"
+    aws_secret_key: "{{ secret_key }}"
+    aws_session_token: "{{ session_token }}"
+    name: "{{ resource_name }}-ssm-role"
+    assume_role_policy_document: |
+      {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Principal": {
+              "Service": "ec2.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+          }
+        ]
+      }
+    managed_policies:
+      - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+    state: present
+    tags:
+      Name: "{{ resource_name }}-ssm-role"
+  register: iam_role_result
+
+- name: Create IAM instance profile
+  amazon.aws.iam_instance_profile:
+    aws_access_key: "{{ access_key }}"
+    aws_secret_key: "{{ secret_key }}"
+    aws_session_token: "{{ session_token }}"
+    name: "{{ resource_name }}-ssm-profile"
+    roles:
+      - "{{ resource_name }}-ssm-role"
+    state: present
+  register: instance_profile_result
+
+- name: Set instance profile fact
+  set_fact:
+    ssm_instance_profile: "{{ resource_name }}-ssm-profile"

@@ -69,7 +69,8 @@
       - name: Init the params config
         set_fact:
           params: "{{ (params|default({})) | combine({
-            'ip': item.public_ip_address
+            'ip': item.public_ip_address,
+            'instance_id': item.instance_id
             })
           }}"
         with_items: "{{ ec2_facts.instances }}"

@@ -44,11 +44,31 @@ module Common
           unless @provisioned_resource.nil?
             destination_remote_user = @provisioned_resource.get_user_name()
             destination_ip = @provisioned_resource.get_ip()
+            instance_id = @provisioned_resource.get_param("instance_id")
+            
             if @provisioned_resource.get_resource().is_windows?()
               keyvalues["ansible_password"] = @provisioned_resource.get_param("win_password")
-              keyvalues["ansible_port"] = "5986"
-              keyvalues["ansible_connection"] = "winrm"
-              keyvalues["ansible_winrm_server_cert_validation"] = "ignore"
+              if instance_id && !instance_id.empty?
+                # Use SSM for Windows as well
+                keyvalues["ansible_connection"] = "aws_ssm"
+                keyvalues["ansible_aws_ssm_bucket_name"] = ""  # Optional S3 bucket for session logs
+                keyvalues["ansible_aws_ssm_region"] = @provisioned_resource.get_resource().get_credential().get_region()
+                keyvalues["ansible_shell_type"] = "powershell"
+                destination_ip = instance_id  # Use instance ID as the target instead of IP
+              else
+                # Fallback to WinRM if instance_id is not available
+                keyvalues["ansible_port"] = "5986"
+                keyvalues["ansible_connection"] = "winrm"
+                keyvalues["ansible_winrm_server_cert_validation"] = "ignore"
+              end
+            else
+              # Use SSM Session Manager for Linux instances
+              if instance_id && !instance_id.empty?
+                keyvalues["ansible_connection"] = "aws_ssm"
+                keyvalues["ansible_aws_ssm_bucket_name"] = ""  # Optional S3 bucket for session logs
+                keyvalues["ansible_aws_ssm_region"] = @provisioned_resource.get_resource().get_credential().get_region()
+                destination_ip = instance_id  # Use instance ID as the target instead of IP
+              end
             end
           end
 
