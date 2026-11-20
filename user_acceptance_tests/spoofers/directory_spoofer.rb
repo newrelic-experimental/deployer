@@ -11,7 +11,7 @@ module UserAcceptanceTests
 
       def dispose()
         filename = get_filename()
-        if Dir.exists?(filename)
+        if Dir.exist?(filename)
           begin
             FileUtils.remove_dir(filename)
           rescue Exception => e

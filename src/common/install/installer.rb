@@ -102,7 +102,7 @@ module Common
       end
 
       def read_params_output(output_params, artifact_filename)
-        if File.exists?(artifact_filename)
+        if File.exist?(artifact_filename)
           reader = Common::Install::ParamsReader.new(output_params)
           reader.read_from_file(artifact_filename)
         end

@@ -92,7 +92,7 @@ module CommandLine
     private
     def download_file(url, filepath)
       Common::Logger::LoggerFactory.get_logger().debug("Downloading from #{url} to #{filepath}")
-      download = open(url)
+      download = URI(url).open
       IO.copy_stream(download, filepath)
     end
 

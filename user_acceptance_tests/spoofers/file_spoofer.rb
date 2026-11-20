@@ -7,7 +7,7 @@ module UserAcceptanceTests
       end
 
       def dispose()
-        if File.exists?(@filename)
+        if File.exist?(@filename)
           begin
             File.delete(@filename)
           rescue Exception => e
