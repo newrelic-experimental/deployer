@@ -31,7 +31,9 @@ describe "Deployment::Aws::TypeValidatorFactory" do
     result = validators[0].call()
 
     result.wont_be_empty()
-    result.must_include("id1")
+    # The resource is a plain Hash, so resolving its type raises NoMethodError. Ruby 3.3+
+    # no longer prints the receiver in that message, so assert on the missing method instead.
+    result.must_include("get_type")
   end
 
   def given_resource(id, type = nil)

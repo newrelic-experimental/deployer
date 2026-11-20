@@ -1,4 +1,4 @@
-FROM python:3.10.8
+FROM ruby:3.4.13-bookworm
 
 RUN apt-get clean all
 RUN apt-get update && DEBIAN_FRONTEND="noninteractive" TZ="America/New_York" apt-get install -y tzdata
@@ -10,9 +10,11 @@ RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
     update-locale LANG=en_US.UTF-8
 ENV LANG en_US.UTF-8
 
-# Install Ruby
-RUN apt-get install ruby-full -y
-RUN gem install bundler -v 1.17.3
+# Ruby comes from the base image (EOL Ruby 2.7 from Debian 11 is affected by CVE-2026-132825).
+# Python is needed for Ansible; Debian 12 blocks system-wide pip installs (PEP 668), so use a venv.
+RUN apt-get update && apt-get install -y python3 python3-venv python3-pip
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
 # Others
 RUN apt-get update
